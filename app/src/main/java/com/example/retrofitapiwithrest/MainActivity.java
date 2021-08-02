@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -29,12 +31,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         jsonPlaceHolderApi = retrofit.create(JsonHolder.class);
-          getpost();
-    //    getComments();
+     //     getpost();
+        getComments();
     }
 
     private void getComments() {
-        Call<List<Comment>> call = jsonPlaceHolderApi.getComments(3);
+        Call<List<Comment>> call = jsonPlaceHolderApi.getComments("post/3/comments");
 
         call.enqueue(new Callback<List<Comment>>() {
             @Override
@@ -66,8 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void getpost() {
 
+        //defining request in key value pairs using strings.
+        Map<String,String>   parameters = new HashMap<>();
+        parameters.put("userId","2");
+        parameters.put("_sort","id");
+        parameters.put("_order","desc");
 
-        Call<List<Post>> call = jsonPlaceHolderApi.getPosts(4,"id","desc");
+
+        Call<List<Post>> call = jsonPlaceHolderApi.getPosts(parameters);
         // this enqueue method will help us to request via background thread not main thread.
         // if you request in main thread it will freeze the application and you will get crash on long request.
         call.enqueue(new Callback<List<Post>>() {

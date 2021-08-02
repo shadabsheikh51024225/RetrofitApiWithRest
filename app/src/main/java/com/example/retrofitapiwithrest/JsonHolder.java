@@ -1,11 +1,14 @@
 package com.example.retrofitapiwithrest;
 
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
+import retrofit2.http.Url;
 
 public interface JsonHolder {
 
@@ -33,7 +36,15 @@ public interface JsonHolder {
     Call<List<Post>> getPosts();
 
 
+    //requesting data in query map formate with key and value pairs.
+    @GET("posts")
+    Call<List<Post>> getPosts(@QueryMap Map<String, String> parameters);
+
     //different type of requests with specific id and  comment type.
     @GET("posts/{id}/comments")
     Call<List<Comment>> getComments(@Path("id") int postId);
+
+    //when structure is quite complicated and you would like to deal with whole url.
+    @GET
+    Call<List<Comment>> getComments(@Url String url);
 }
