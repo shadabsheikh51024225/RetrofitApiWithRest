@@ -29,12 +29,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         jsonPlaceHolderApi = retrofit.create(JsonHolder.class);
-        //  getpost();
-        getComments();
+          getpost();
+    //    getComments();
     }
 
     private void getComments() {
-        Call<List<Comment>> call = jsonPlaceHolderApi.getComments();
+        Call<List<Comment>> call = jsonPlaceHolderApi.getComments(3);
 
         call.enqueue(new Callback<List<Comment>>() {
             @Override
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private void getpost() {
 
 
-        Call<List<Post>> call = jsonPlaceHolderApi.getPosts();
+        Call<List<Post>> call = jsonPlaceHolderApi.getPosts(4,"id","desc");
         // this enqueue method will help us to request via background thread not main thread.
         // if you request in main thread it will freeze the application and you will get crash on long request.
         call.enqueue(new Callback<List<Post>>() {
