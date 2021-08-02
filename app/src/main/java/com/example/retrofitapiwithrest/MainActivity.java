@@ -8,10 +8,15 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,20 +33,37 @@ public class MainActivity extends AppCompatActivity {
         textViewResult = findViewById(R.id.text_view_result);
 
 
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+
+        //adding dynamic header to build request.
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().
+        addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                Request originalRequest = chain.request();
+                Request newRequest = originalRequest.newBuilder()
+                        .header("Interceptor-Header", "xyz")
+                        .build();
+                return chain.proceed(newRequest);
+            }
+        }).build();
         //Gson will automatically ignor null value. To make it accept the null value we have to serializenulls
         Gson gson = new GsonBuilder().serializeNulls().create();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://jsonplaceholder.typicode.com/")
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
                 .build();
 
 
         jsonPlaceHolderApi = retrofit.create(JsonHolder.class);
-     //     getpost();
+         getpost();
       //  getComments();
-       // updatePost();
-        deletePost();
+    //   updatePost();
+       // deletePost();
     }
 
     private void deletePost() {
@@ -61,10 +83,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePost() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Map-Header1", "def");
+        headers.put("Map-Header2", "ghi");
 
         //here we are sending data to update. this will update all data and tittle to null
         Post post = new Post(12, null, "New Text");
-        Call<Post> call = jsonPlaceHolderApi.patchPost(5, post);
+        Call<Post> call = jsonPlaceHolderApi.patchPost(headers,5, post);
         call.enqueue(new Callback<Post>() {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
